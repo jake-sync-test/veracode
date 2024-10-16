@@ -3,45 +3,60 @@ name: Sync Repositories
 on:
   workflow_dispatch:  # Manual trigger
   schedule:
-    - cron: '0 14 * * *'  # Optional: Daily sync at midnight
+    - cron: '0 0 * * *'  # Daily sync at midnight
 
 env:
   SOURCE_REPO: github-actions-integration
   SOURCE_OWNER: veracode
+  BRANCH: sync-branch-$(date +'%Y%m%d%H%M%S')
 
 jobs:
   sync-repos:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Check out target repository (this repo)
       - name: Check out target repository
         uses: actions/checkout@v3
 
+      # Step 2: Check out source repository (external repo)
       - name: Check out source repository
         uses: actions/checkout@v3
         with:
           repository: ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}
           path: source-repo
 
-      - name: Sync files
+      - name: print
         run: |
-          BRANCH="sync-branch-$(date +'%Y%m%d%H%M%S')"
-          git checkout -b $BRANCH
-          rsync -av --delete source-repo/ ./ 
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "GitHub Actions Bot"
-          git add .
-          git commit -m "Sync changes from source repository" || echo "No changes to commit"
-          git push origin $BRANCH
+          echo ${{ env.BRANCH }}
 
-#      - name: Push changes to a new branch
+#      # Step 3: Delete all files in target repo except veracode.yaml
+#      - name: Delete all files except veracode.yaml
 #        run: |
-#          BRANCH="sync-branch-$(date +'%Y%m%d%H%M%S')"
+#          find . -mindepth 1 -not -name 'veracode.yaml' -exec rm -rf {} +
+#
+#      # Step 4: Copy files from source repo (excluding veracode.yaml)
+#      - name: Sync files from source repo (excluding veracode.yaml)
+#        run: |
+#          rsync -av --exclude 'veracode.yaml' source-repo/ ./
+#
+#      # Step 5: Commit and push changes to a new branch
+#      - name: Commit and push changes
+#        run: |
+#          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#          git config --global user.name "GitHub Actions Bot"
+#
+#
 #          git checkout -b $BRANCH
+#
+#          git add .
+#          git commit -m "Sync changes from source repository" || echo "No changes to commit"
+#
 #          git push origin $BRANCH
-
-      - name: Create Pull Request using GitHub CLI
-        run: |
-          gh pr create --head $BRANCH --base main \
-            --title "Sync changes from source repository" \
-            --body "This pull request contains changes to keep the target repo in sync with the source repo."
+#
+#      # Step 6: Open a Pull Request using GitHub CLI
+#      - name: Create Pull Request
+#        run: |
+#          gh pr create --head $BRANCH --base main \
+#            --title "Sync changes from source repository" \
+#            --body "This pull request contains the latest changes from the source repository, with veracode.yaml preserved."
