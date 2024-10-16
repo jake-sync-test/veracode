@@ -26,15 +26,13 @@ jobs:
           repository: ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}
           path: source-repo
 
-      - name: print
+      # Step 3: Delete all files in target repo except veracode.yaml
+      - name: Delete all files except veracode.yaml
         run: |
-          echo ${{ env.BRANCH }}
+          ls -la
+          find . -mindepth 1 -not -name 'veracode.yaml' -exec rm -rf {} +
+          ls -la
 
-#      # Step 3: Delete all files in target repo except veracode.yaml
-#      - name: Delete all files except veracode.yaml
-#        run: |
-#          find . -mindepth 1 -not -name 'veracode.yaml' -exec rm -rf {} +
-#
 #      # Step 4: Copy files from source repo (excluding veracode.yaml)
 #      - name: Sync files from source repo (excluding veracode.yaml)
 #        run: |
