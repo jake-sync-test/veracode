@@ -32,10 +32,10 @@ jobs:
       - name: Delete all files except veracode.yml
         run: |
           ls -la
-          cp ./target-repo/veracode.yml ./veracode.yaml
-          rm -rf ./target-repo
-          echo "Verify that veracode.yml is still there"
-          ls -la 
+#          cp ./target-repo/veracode.yml ./veracode.yaml
+#          rm -rf ./target-repo
+#          echo "Verify that veracode.yml is still there"
+#          ls -la 
 
 #      # Step 5: Commit and push changes to a new branch
 #      - name: Commit and push changes
