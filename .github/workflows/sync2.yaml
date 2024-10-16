@@ -1,0 +1,47 @@
+name: Sync Repositories
+
+on:
+  workflow_dispatch:  # Manual trigger
+  schedule:
+    - cron: '0 14 * * *'  # Optional: Daily sync at midnight
+
+env:
+  SOURCE_REPO: github-actions-integration
+  SOURCE_OWNER: veracode
+
+jobs:
+  sync-repos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out target repository
+        uses: actions/checkout@v3
+
+      - name: Check out source repository
+        uses: actions/checkout@v3
+        with:
+          repository: ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}
+          path: source-repo
+
+      - name: Sync files
+        run: |
+          BRANCH="sync-branch-$(date +'%Y%m%d%H%M%S')"
+          git checkout -b $BRANCH
+          rsync -av --delete source-repo/ ./ 
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions Bot"
+          git add .
+          git commit -m "Sync changes from source repository" || echo "No changes to commit"
+          git push origin $BRANCH
+
+#      - name: Push changes to a new branch
+#        run: |
+#          BRANCH="sync-branch-$(date +'%Y%m%d%H%M%S')"
+#          git checkout -b $BRANCH
+#          git push origin $BRANCH
+
+      - name: Create Pull Request using GitHub CLI
+        run: |
+          gh pr create --head $BRANCH --base main \
+            --title "Sync changes from source repository" \
+            --body "This pull request contains changes to keep the target repo in sync with the source repo."
