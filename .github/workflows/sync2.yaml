@@ -18,28 +18,24 @@ jobs:
       # Step 1: Check out target repository (this repo)
       - name: Check out target repository
         uses: actions/checkout@v3
+        with:
+          path: target-repo
 
       # Step 2: Check out source repository (external repo)
       - name: Check out source repository
         uses: actions/checkout@v3
         with:
           repository: ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}
-          path: source-repo
+
 
       # Step 3: Delete all files in target repo except veracode.yml
       - name: Delete all files except veracode.yml
         run: |
-          echo "Starting deletion"
-          find . -mindepth 1 | grep -v 'veracode.yml' | xargs rm -rf
+          ls -la
+          cp ./target-repo/veracode.yml ./veracode.yaml
+          rm -rf ./target-repo
           echo "Verify that veracode.yml is still there"
-          ls -la
-
-      # Step 4: Copy files from source repo (excluding veracode.yml)
-      - name: Sync files from source repo (excluding veracode.yml)
-        run: |
-          rsync -av --exclude 'veracode.yml' source-repo/ ./
-          echo "Verify file structure"
-          ls -la
+          ls -la 
 
 #      # Step 5: Commit and push changes to a new branch
 #      - name: Commit and push changes
