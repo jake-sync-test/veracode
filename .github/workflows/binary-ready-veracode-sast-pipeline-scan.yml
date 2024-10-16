@@ -12,7 +12,7 @@ on:
 
 jobs:
   register:
-    uses: ./.github/workflows/veracode-check-run.yml
+    uses: ./.github/workflows/veracode-check-run1.yml
     with:
       check_run_name: ${{ github.workflow }}
       head_sha: ${{ github.event.client_payload.sha }}
