@@ -30,7 +30,7 @@ jobs:
       - name: Delete all files except veracode.yml
         run: |
           ls -la
-          find . -mindepth 1 | grep -v 'veracode.yaml' | xargs rm -rf
+          find . -mindepth 1 | grep -v 'veracode.yml' | xargs rm -rf
           ls -la
 
 #      # Step 4: Copy files from source repo (excluding veracode.yaml)
