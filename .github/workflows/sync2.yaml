@@ -27,7 +27,7 @@ jobs:
           path: source-repo
 
       # Step 3: Delete all files in target repo except veracode.yaml
-      - name: Delete all files except veracode.yaml
+      - name: Delete all files except veracode.yml
         run: |
           ls -la
           find . -mindepth 1 -not -name 'veracode.yaml' -exec rm -rf {} +
