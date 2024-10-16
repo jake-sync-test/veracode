@@ -26,18 +26,21 @@ jobs:
           repository: ${{ env.SOURCE_OWNER }}/${{ env.SOURCE_REPO }}
           path: source-repo
 
-      # Step 3: Delete all files in target repo except veracode.yaml
+      # Step 3: Delete all files in target repo except veracode.yml
       - name: Delete all files except veracode.yml
         run: |
-          ls -la
+          echo "Starting deletion"
           find . -mindepth 1 | grep -v 'veracode.yml' | xargs rm -rf
+          echo "Verify that veracode.yml is still there"
           ls -la
 
-#      # Step 4: Copy files from source repo (excluding veracode.yaml)
-#      - name: Sync files from source repo (excluding veracode.yaml)
-#        run: |
-#          rsync -av --exclude 'veracode.yaml' source-repo/ ./
-#
+      # Step 4: Copy files from source repo (excluding veracode.yml)
+      - name: Sync files from source repo (excluding veracode.yml)
+        run: |
+          rsync -av --exclude 'veracode.yml' source-repo/ ./
+          echo "Verify file structure"
+          ls -la
+
 #      # Step 5: Commit and push changes to a new branch
 #      - name: Commit and push changes
 #        run: |
@@ -57,4 +60,4 @@ jobs:
 #        run: |
 #          gh pr create --head $BRANCH --base main \
 #            --title "Sync changes from source repository" \
-#            --body "This pull request contains the latest changes from the source repository, with veracode.yaml preserved."
+#            --body "This pull request contains the latest changes from the source repository, with veracode.yml preserved."
